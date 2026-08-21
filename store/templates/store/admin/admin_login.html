@@ -1,0 +1,45 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}Admin Login{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="container">
+        <div class="auth-container">
+            <div class="auth-box animate-on-scroll">
+                <div class="auth-header">
+                    <i class="fas fa-user-shield"></i>
+                    <h2>Admin Login</h2>
+                    <p>Access the admin panel</p>
+                </div>
+                <form method="POST" action="{% url 'accounts:login' %}" class="auth-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{% url 'store:admin_dashboard' %}">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <div class="input-group">
+                            <i class="fas fa-user"></i>
+                            <input type="text" name="username" id="username" placeholder="Enter your username" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" name="password" id="password" placeholder="Enter your password"
+                                required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                </form>
+                <div class="auth-footer">
+                    <p><a href="{% url 'accounts:login' %}"><i class="fas fa-user"></i> Customer Login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

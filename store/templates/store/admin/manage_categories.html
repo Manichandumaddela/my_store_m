@@ -1,0 +1,86 @@
+{% extends 'store/admin/base_admin.html' %}
+{% load static %}
+
+{% block admin_title %}Manage Categories - FreshCart Admin{% endblock %}
+
+{% block admin_content %}
+<div class="admin-content-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+        <div>
+            <h1 style="font-size: 1.5rem; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-layer-group" style="color: var(--admin-primary);"></i> Product Categories
+            </h1>
+            <p style="color: #64748b; font-size: 0.9rem; margin-top: 4px;">Organize your products with categories, icons, and descriptions.</p>
+        </div>
+        <a href="{% url 'store:add_category' %}" class="admin-btn admin-btn-primary">
+            <i class="fas fa-plus"></i> Add New Category
+        </a>
+    </div>
+
+    <!-- Categories Grid / Table -->
+    <div style="overflow-x: auto;">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Slug</th>
+                    <th>Icon</th>
+                    <th>Description</th>
+                    <th>Total Products</th>
+                    <th>Total Stock</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in categories %}
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 42px; height: 42px; border-radius: 8px; background: #f0fdf4; color: #15803d; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                                <i class="{{ category.icon|default:'fas fa-leaf' }}"></i>
+                            </div>
+                            <strong style="color: #1e293b; font-size: 0.95rem;">{{ category.name }}</strong>
+                        </div>
+                    </td>
+                    <td>
+                        <code style="color: #64748b; font-size: 0.85rem;">{{ category.slug }}</code>
+                    </td>
+                    <td>
+                        <span style="font-size: 0.85rem; color: #64748b;">{{ category.icon|default:'None' }}</span>
+                    </td>
+                    <td style="color: #64748b; font-size: 0.88rem; max-width: 250px;">
+                        {{ category.description|default:'No description'|truncatewords:8 }}
+                    </td>
+                    <td>
+                        <span class="status-badge status-delivered">
+                            {{ category.prod_count|default:0 }} products
+                        </span>
+                    </td>
+                    <td>
+                        <span style="font-weight: 600; color: #1e293b; font-size: 0.9rem;">
+                            {{ category.total_stock|default:0 }} in stock
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 8px;">
+                            <a href="{% url 'store:edit_category' pk=category.id %}" class="admin-btn admin-btn-secondary" style="padding: 6px 10px; font-size: 0.82rem;" title="Edit Category">
+                                <i class="fas fa-pen-to-square"></i>
+                            </a>
+                            <a href="{% url 'store:delete_category' pk=category.id %}" class="admin-btn admin-btn-danger" style="padding: 6px 10px; font-size: 0.82rem;" title="Delete Category" onclick="return confirm('Delete category {{ category.name }}? All products in this category will also be deleted.')">
+                                <i class="fas fa-trash-can"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" style="text-align: center; color: #94a3b8; padding: 40px;">
+                        No categories found. Click "Add New Category" to create one.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

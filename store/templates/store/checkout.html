@@ -1,0 +1,151 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}Checkout - FreshCart{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 20px 0 60px;">
+    <h1 style="font-size: 2rem; font-weight: 800; color: var(--text-main); margin-bottom: 24px; display: flex; align-items: center; gap: 12px;">
+        <i class="fas fa-shield-check" style="color: var(--primary);"></i> Express Checkout
+    </h1>
+
+    <div style="display: grid; grid-template-columns: 3fr 2fr; gap: 32px; align-items: start;">
+        <!-- Shipping & Payment Form -->
+        <div style="background: #ffffff; border-radius: var(--radius-xl); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); padding: 32px;">
+            <form method="POST" action="{% url 'store:checkout' %}" id="checkoutForm">
+                {% csrf_token %}
+
+                <!-- Step 1: Customer & Delivery Info -->
+                <div style="margin-bottom: 30px;">
+                    <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 18px; display: flex; align-items: center; gap: 10px;">
+                        <span style="width: 28px; height: 28px; background: var(--primary); color: #fff; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem;">1</span>
+                        Delivery Information
+                    </h2>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                        <div class="form-group">
+                            <label class="form-label" for="{{ form.full_name.id_for_label }}">Full Name *</label>
+                            {{ form.full_name }}
+                            {% if form.full_name.errors %}<span style="color: var(--danger); font-size: 0.8rem;">{{ form.full_name.errors.0 }}</span>{% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="{{ form.email.id_for_label }}">Email Address *</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}<span style="color: var(--danger); font-size: 0.8rem;">{{ form.email.errors.0 }}</span>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label" for="{{ form.phone.id_for_label }}">Phone Number *</label>
+                        {{ form.phone }}
+                        {% if form.phone.errors %}<span style="color: var(--danger); font-size: 0.8rem;">{{ form.phone.errors.0 }}</span>{% endif %}
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label" for="{{ form.address.id_for_label }}">Street Address & House/Flat # *</label>
+                        {{ form.address }}
+                        {% if form.address.errors %}<span style="color: var(--danger); font-size: 0.8rem;">{{ form.address.errors.0 }}</span>{% endif %}
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="form-group">
+                            <label class="form-label" for="{{ form.city.id_for_label }}">City *</label>
+                            {{ form.city }}
+                            {% if form.city.errors %}<span style="color: var(--danger); font-size: 0.8rem;">{{ form.city.errors.0 }}</span>{% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="{{ form.postal_code.id_for_label }}">Postal Code *</label>
+                            {{ form.postal_code }}
+                            {% if form.postal_code.errors %}<span style="color: var(--danger); font-size: 0.8rem;">{{ form.postal_code.errors.0 }}</span>{% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Payment Option -->
+                <div style="margin-bottom: 30px; padding-top: 24px; border-top: 1px solid var(--border-color);">
+                    <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 18px; display: flex; align-items: center; gap: 10px;">
+                        <span style="width: 28px; height: 28px; background: var(--primary); color: #fff; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem;">2</span>
+                        Payment Method
+                    </h2>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 16px;">
+                        {% for choice in form.payment_method %}
+                        <div class="payment-method-card" style="border: 2px solid var(--border-color); border-radius: var(--radius-md); padding: 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s;">
+                            {{ choice.tag }}
+                            <label for="{{ choice.id_for_label }}" style="font-weight: 600; font-size: 0.92rem; cursor: pointer; margin: 0;">
+                                {{ choice.choice_label }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Step 3: Order Notes -->
+                <div style="margin-bottom: 30px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.order_notes.id_for_label }}">Order Notes / Special Delivery Instructions (Optional)</label>
+                        {{ form.order_notes }}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; justify-content: center; font-size: 1.1rem; box-shadow: var(--shadow-lg);">
+                    <i class="fas fa-circle-check"></i> Confirm & Place Order (₹{{ cart.grand_total|floatformat:2 }})
+                </button>
+            </form>
+        </div>
+
+        <!-- Order Items Review Box -->
+        <div style="background: #ffffff; border-radius: var(--radius-xl); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); padding: 28px;">
+            <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 18px;">Items in Your Order</h3>
+
+            <div style="max-height: 280px; overflow-y: auto; margin-bottom: 20px; padding-right: 6px;">
+                {% for item in cart_items %}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 42px; height: 42px; background: #f8fafc; border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #e2e8f0;">
+                            {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                            {% else %}
+                                <i class="fas fa-basket-shopping" style="color: var(--primary); font-size: 1rem;"></i>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 0.92rem; color: var(--text-main);">{{ item.product.name }}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">₹{{ item.product.final_price|floatformat:2 }} × {{ item.quantity }}</div>
+                        </div>
+                    </div>
+                    <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;">
+                        ₹{{ item.subtotal|floatformat:2 }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Totals -->
+            <div style="border-top: 1px solid var(--border-color); padding-top: 16px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.92rem; color: var(--text-muted);">
+                    <span>Subtotal</span>
+                    <span style="font-weight: 700; color: var(--text-main);">₹{{ cart.subtotal|floatformat:2 }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.92rem; color: var(--text-muted);">
+                    <span>Delivery</span>
+                    {% if cart.shipping_fee > 0 %}
+                        <span style="font-weight: 700; color: var(--text-main);">₹{{ cart.shipping_fee|floatformat:2 }}</span>
+                    {% else %}
+                        <span style="font-weight: 700; color: var(--success);">FREE</span>
+                    {% endif %}
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-top: 14px; border-top: 2px solid var(--border-color); font-size: 1.25rem; font-weight: 800; color: var(--text-main);">
+                    <span>Grand Total</span>
+                    <span style="color: var(--primary);">₹{{ cart.grand_total|floatformat:2 }}</span>
+                </div>
+            </div>
+
+            <!-- Guarantee -->
+            <div style="margin-top: 24px; background: #f8fafc; border-radius: var(--radius-md); padding: 14px; font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">
+                <i class="fas fa-lock" style="color: var(--primary);"></i> 256-bit encrypted checkout. Satisfaction guaranteed.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

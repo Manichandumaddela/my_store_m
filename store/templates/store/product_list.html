@@ -1,0 +1,173 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if selected_category %}{{ selected_category.name }} - FreshCart
+    {% elif query %}Search results for "{{ query }}" - FreshCart
+    {% else %}FreshCart - Fresh Organic Groceries & Farm Produce{% endif %}
+{% endblock %}
+
+{% block content %}
+    <!-- Hero Banner (Shown on Main Home View) -->
+    {% if not query and not selected_category %}
+    <section class="hero-section">
+        <div class="hero-content">
+            <span class="hero-tag"><i class="fas fa-sparkles"></i> 100% Organic & Farm Fresh</span>
+            <h1 class="hero-title">Stay Healthy with <span>Fresh Grocery</span> Everyday</h1>
+            <p class="hero-desc">
+                Handpicked farm-fresh vegetables, organic fruits, artisan bakery, and daily dairy delivered in 30 minutes.
+            </p>
+            <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+                <a href="#shop-now" class="btn btn-primary btn-lg" style="background: #ffffff; color: #065f46; box-shadow: var(--shadow-lg);">
+                    <i class="fas fa-shopping-basket"></i> Shop Now
+                </a>
+                <a href="{% url 'store:product_list' %}" class="btn btn-outline btn-lg" style="color: #fff; border-color: rgba(255,255,255,0.4);">
+                    Explore Catalog
+                </a>
+            </div>
+
+            <div class="hero-badges">
+                <div class="hero-badge-item">
+                    <i class="fas fa-shield-alt" style="color: #34d399;"></i> Certified Quality
+                </div>
+                <div class="hero-badge-item">
+                    <i class="fas fa-bolt" style="color: #fde047;"></i> 30-Min Fast Delivery
+                </div>
+                <div class="hero-badge-item">
+                    <i class="fas fa-undo" style="color: #6ee7b7;"></i> Easy Returns
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Catalog Header / Filter Bar -->
+    <div id="shop-now" class="section-header" style="margin-top: 10px;">
+        <div>
+            <h2 class="section-title">
+                {% if selected_category %}
+                    <i class="{{ selected_category.icon|default:'fas fa-leaf' }}" style="color: var(--primary);"></i> {{ selected_category.name }}
+                {% elif query %}
+                    Search Results for "<span style="color: var(--primary);">{{ query }}</span>"
+                {% else %}
+                    Popular Fresh Groceries
+                {% endif %}
+            </h2>
+            <p class="section-subtitle">
+                {% if selected_category %}{{ selected_category.description|default:'Browse all fresh products in this category' }}
+                {% elif query %}Found {{ total_count }} product{{ total_count|pluralize }} matching your query
+                {% else %}Explore our selection of top-quality organic products and daily essentials{% endif %}
+            </p>
+        </div>
+
+        <!-- Sorting Selector Form -->
+        <form method="GET" action="" style="display: flex; align-items: center; gap: 10px;">
+            {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+            {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category.slug }}">{% endif %}
+            <label for="sort-select" style="font-size: 0.88rem; font-weight: 600; color: var(--text-muted); white-space: nowrap;">Sort by:</label>
+            <select id="sort-select" name="sort" class="form-select" style="padding: 6px 12px; font-size: 0.88rem;" onchange="this.form.submit()">
+                <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest First</option>
+                <option value="price-asc" {% if sort_by == 'price-asc' %}selected{% endif %}>Price: Low to High</option>
+                <option value="price-desc" {% if sort_by == 'price-desc' %}selected{% endif %}>Price: High to Low</option>
+                <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Name (A-Z)</option>
+            </select>
+        </form>
+    </div>
+
+    <!-- Product Grid -->
+    {% if products %}
+    <div class="product-grid">
+        {% for product in products %}
+        <div class="product-card">
+            <!-- Badges -->
+            <div class="product-badge-group">
+                {% if product.discount_percent > 0 %}
+                    <span class="badge-discount">-{{ product.discount_percent }}% OFF</span>
+                {% endif %}
+                {% if product.is_featured %}
+                    <span class="badge-featured"><i class="fas fa-star"></i> Featured</span>
+                {% endif %}
+            </div>
+
+            <!-- Product Image -->
+            <a href="{% url 'store:product_detail' slug=product.slug %}" class="product-img-wrapper">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+                {% else %}
+                    <!-- Fallback SVG icon -->
+                    <div style="font-size: 4rem; color: #10b981; opacity: 0.85;">
+                        <i class="fas fa-basket-shopping"></i>
+                    </div>
+                {% endif %}
+            </a>
+
+            <!-- Product Details -->
+            <div class="product-info">
+                <div class="product-category">{{ product.category.name }}</div>
+                <a href="{% url 'store:product_detail' slug=product.slug %}" class="product-name">
+                    {{ product.name }}
+                </a>
+                <div class="product-unit">{{ product.get_unit_display }}</div>
+
+                <div class="product-bottom-row">
+                    <div class="price-box">
+                        <span class="current-price">₹{{ product.final_price|floatformat:2 }}</span>
+                        {% if product.discount_price and product.discount_price < product.price %}
+                            <span class="old-price">₹{{ product.price|floatformat:2 }}</span>
+                        {% endif %}
+                    </div>
+
+                    {% if product.in_stock %}
+                        <form action="{% url 'store:add_to_cart' product_id=product.id %}" method="POST" style="margin: 0;">
+                            {% csrf_token %}
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn-add-cart ajax-add-to-cart" title="Add to Cart" id="addCartBtn_{{ product.id }}">
+                                <i class="fas fa-cart-plus"></i> Add
+                            </button>
+                        </form>
+                    {% else %}
+                        <span style="font-size: 0.8rem; font-weight: 700; color: var(--danger); background: var(--danger-light); padding: 4px 8px; border-radius: var(--radius-sm);">
+                            Out of Stock
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if products.has_other_pages %}
+    <div style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 40px;">
+        {% if products.has_previous %}
+            <a href="?page={{ products.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category.slug }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" class="btn btn-outline btn-sm">
+                <i class="fas fa-chevron-left"></i> Previous
+            </a>
+        {% endif %}
+
+        <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted); padding: 0 10px;">
+            Page {{ products.number }} of {{ products.paginator.num_pages }}
+        </span>
+
+        {% if products.has_next %}
+            <a href="?page={{ products.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category.slug }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" class="btn btn-outline btn-sm">
+                Next <i class="fas fa-chevron-right"></i>
+            </a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty State -->
+    <div style="text-align: center; padding: 60px 20px; background: #fff; border-radius: var(--radius-lg); border: 1px solid var(--border-color); margin-top: 20px;">
+        <div style="font-size: 3.5rem; color: #cbd5e1; margin-bottom: 16px;">
+            <i class="fas fa-search"></i>
+        </div>
+        <h3 style="margin-bottom: 8px;">No products found</h3>
+        <p style="color: var(--text-muted); margin-bottom: 24px;">We couldn't find any items matching your current filters or search terms.</p>
+        <a href="{% url 'store:product_list' %}" class="btn btn-primary">
+            <i class="fas fa-redo"></i> Reset Filters & View All
+        </a>
+    </div>
+    {% endif %}
+{% endblock %}

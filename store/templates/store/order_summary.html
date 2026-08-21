@@ -1,0 +1,116 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}Order Confirmation - #{{ order.order_number }} - FreshCart{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; padding: 30px 0 60px;">
+    <!-- Success Banner -->
+    <div style="background: #ffffff; border-radius: var(--radius-xl); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); padding: 40px; text-align: center; margin-bottom: 24px;">
+        <div style="width: 72px; height: 72px; background: #dcfce7; color: #16a34a; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 2.2rem; margin-bottom: 16px;">
+            <i class="fas fa-check"></i>
+        </div>
+        <h1 style="font-size: 2rem; font-weight: 800; color: var(--text-main); margin-bottom: 8px;">Order Placed Successfully!</h1>
+        <p style="color: var(--text-muted); font-size: 1.05rem; margin-bottom: 16px;">
+            Thank you for ordering with FreshCart. Your fresh groceries are being packed!
+        </p>
+        <div style="display: inline-block; background: #f1f5f9; padding: 8px 18px; border-radius: 999px; font-weight: 700; color: var(--primary); font-size: 0.95rem;">
+            Order Reference: #{{ order.order_number }}
+        </div>
+    </div>
+
+    <!-- Order Metadata & Details -->
+    <div style="background: #ffffff; border-radius: var(--radius-xl); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); padding: 32px; margin-bottom: 24px;">
+        <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 20px;">
+            <i class="fas fa-receipt" style="color: var(--primary);"></i> Order Summary Details
+        </h2>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 24px; background: #f8fafc; padding: 20px; border-radius: var(--radius-lg);">
+            <div>
+                <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Placed On</span>
+                <div style="font-weight: 700; color: var(--text-main); margin-top: 4px;">{{ order.created_at|date:"M d, Y" }}</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">{{ order.created_at|date:"H:i A" }}</div>
+            </div>
+            <div>
+                <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Status</span>
+                <div style="margin-top: 4px;">
+                    <span style="background: #eff6ff; color: #1d4ed8; font-weight: 700; font-size: 0.85rem; padding: 4px 10px; border-radius: 6px;">
+                        {{ order.order_status }}
+                    </span>
+                </div>
+            </div>
+            <div>
+                <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Payment</span>
+                <div style="font-weight: 700; color: var(--text-main); margin-top: 4px;">{{ order.get_payment_method_display }}</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">({{ order.payment_status }})</div>
+            </div>
+            <div>
+                <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Total</span>
+                <div style="font-weight: 800; color: var(--primary); font-size: 1.2rem; margin-top: 2px;">₹{{ order.grand_total|floatformat:2 }}</div>
+            </div>
+        </div>
+
+        <!-- Items Ordered -->
+        <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--text-main); margin-bottom: 14px;">Items ({{ order.items.count }})</h3>
+        <div style="border-top: 1px solid var(--border-color); margin-bottom: 20px;">
+            {% for item in order.items.all %}
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #f1f5f9;">
+                <div>
+                    <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;">{{ item.product_name }}</div>
+                    <div style="font-size: 0.82rem; color: var(--text-muted);">₹{{ item.price|floatformat:2 }} × {{ item.quantity }} ({{ item.product_unit }})</div>
+                </div>
+                <div style="font-weight: 700; color: var(--text-main); font-size: 1rem;">
+                    ₹{{ item.subtotal|floatformat:2 }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Totals Calculation -->
+        <div style="padding-top: 10px; max-width: 320px; margin-left: auto;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.92rem; color: var(--text-muted);">
+                <span>Subtotal</span>
+                <span style="font-weight: 700; color: var(--text-main);">₹{{ order.total_amount|floatformat:2 }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.92rem; color: var(--text-muted);">
+                <span>Delivery</span>
+                <span style="font-weight: 700; color: var(--text-main);">
+                    {% if order.shipping_fee > 0 %}₹{{ order.shipping_fee|floatformat:2 }}{% else %}FREE{% endif %}
+                </span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding-top: 10px; border-top: 2px solid var(--border-color); font-size: 1.2rem; font-weight: 800; color: var(--text-main);">
+                <span>Grand Total</span>
+                <span style="color: var(--primary);">₹{{ order.grand_total|floatformat:2 }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shipping Destination Box -->
+    <div style="background: #ffffff; border-radius: var(--radius-xl); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); padding: 24px; margin-bottom: 30px;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 10px;">
+            <i class="fas fa-location-dot" style="color: var(--primary);"></i> Delivery Address
+        </h3>
+        <p style="color: #334155; font-size: 0.95rem; margin-bottom: 4px;">
+            <strong>{{ order.full_name }}</strong> • {{ order.phone }}
+        </p>
+        <p style="color: #64748b; font-size: 0.9rem;">
+            {{ order.address }}, {{ order.city }} {{ order.postal_code }}
+        </p>
+        {% if order.order_notes %}
+        <p style="margin-top: 8px; font-size: 0.85rem; color: #64748b; background: #f8fafc; padding: 8px 12px; border-radius: 6px;">
+            <strong>Note:</strong> {{ order.order_notes }}
+        </p>
+        {% endif %}
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+        <a href="{% url 'store:home' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-shopping-basket"></i> Continue Shopping
+        </a>
+        <a href="{% url 'store:my_orders' %}" class="btn btn-outline btn-lg">
+            <i class="fas fa-clock-rotate-left"></i> View All Orders
+        </a>
+    </div>
+</div>
+{% endblock %}

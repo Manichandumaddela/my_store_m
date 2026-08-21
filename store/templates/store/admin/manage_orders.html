@@ -1,0 +1,134 @@
+{% extends 'store/admin/base_admin.html' %}
+{% load static %}
+
+{% block admin_title %}Manage Orders - FreshCart Admin{% endblock %}
+
+{% block admin_content %}
+<div class="admin-content-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+        <div>
+            <h1 style="font-size: 1.5rem; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-dolly" style="color: var(--admin-primary);"></i> Manage Customer Orders
+            </h1>
+            <p style="color: #64748b; font-size: 0.9rem; margin-top: 4px;">Update order fulfillment statuses, tracking, and payment verification.</p>
+        </div>
+    </div>
+
+    <!-- Filter and Search Bar -->
+    <div style="background: #f8fafc; padding: 16px 20px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 24px; display: flex; gap: 16px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+        <form method="GET" action="" style="display: flex; gap: 12px; flex: 1; max-width: 500px;">
+            <input type="text" name="q" value="{{ query }}" placeholder="Search by order #, customer name, email, or phone..." style="flex: 1; padding: 8px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none;">
+            <button type="submit" class="admin-btn admin-btn-primary" style="padding: 8px 16px;">
+                <i class="fas fa-search"></i>
+            </button>
+        </form>
+
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <span style="font-size: 0.88rem; font-weight: 600; color: #64748b;">Filter Status:</span>
+            <a href="{% url 'store:manage_orders' %}" class="admin-btn {% if not status_filter %}admin-btn-primary{% else %}admin-btn-secondary{% endif %}" style="padding: 6px 12px; font-size: 0.85rem;">All</a>
+            <a href="?status=Pending" class="admin-btn {% if status_filter == 'Pending' %}admin-btn-primary{% else %}admin-btn-secondary{% endif %}" style="padding: 6px 12px; font-size: 0.85rem;">Pending</a>
+            <a href="?status=Processing" class="admin-btn {% if status_filter == 'Processing' %}admin-btn-primary{% else %}admin-btn-secondary{% endif %}" style="padding: 6px 12px; font-size: 0.85rem;">Processing</a>
+            <a href="?status=Shipped" class="admin-btn {% if status_filter == 'Shipped' %}admin-btn-primary{% else %}admin-btn-secondary{% endif %}" style="padding: 6px 12px; font-size: 0.85rem;">Shipped</a>
+            <a href="?status=Delivered" class="admin-btn {% if status_filter == 'Delivered' %}admin-btn-primary{% else %}admin-btn-secondary{% endif %}" style="padding: 6px 12px; font-size: 0.85rem;">Delivered</a>
+        </div>
+    </div>
+
+    <!-- Orders Table -->
+    <div style="overflow-x: auto;">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Customer & Address</th>
+                    <th>Date & Method</th>
+                    <th>Items</th>
+                    <th>Grand Total</th>
+                    <th>Payment</th>
+                    <th>Fulfillment Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>
+                        <strong style="color: var(--admin-primary); font-size: 0.95rem;">#{{ order.order_number }}</strong>
+                    </td>
+                    <td>
+                        <div style="font-weight: 700; color: #1e293b;">{{ order.full_name }}</div>
+                        <div style="font-size: 0.82rem; color: #64748b;">{{ order.phone }} • {{ order.email }}</div>
+                        <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 2px;">{{ order.address }}, {{ order.city }}</div>
+                    </td>
+                    <td>
+                        <div style="font-size: 0.88rem; color: #1e293b;">{{ order.created_at|date:"M d, Y" }}</div>
+                        <div style="font-size: 0.8rem; color: #64748b;">{{ order.created_at|date:"H:i A" }} • {{ order.get_payment_method_display }}</div>
+                    </td>
+                    <td>
+                        <span style="font-weight: 600; color: #1e293b;">{{ order.items.count }} item{{ order.items.count|pluralize }}</span>
+                        <div style="font-size: 0.8rem; color: #64748b;">
+                            {% for itm in order.items.all|slice:":2" %}
+                                • {{ itm.product_name }} (x{{ itm.quantity }})<br>
+                            {% endfor %}
+                            {% if order.items.count > 2 %}
+                                <span style="color: #94a3b8;">+{{ order.items.count|add:"-2" }} more</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <strong style="font-size: 1.05rem; color: #0f172a;">₹{{ order.grand_total|floatformat:2 }}</strong>
+                    </td>
+                    <td>
+                        <form method="POST" action="{% url 'store:update_order_status' order_id=order.id %}" style="margin: 0;">
+                            {% csrf_token %}
+                            <input type="hidden" name="order_id" value="{{ order.id }}">
+                            <select name="payment_status" onchange="this.form.submit()" style="padding: 4px 8px; border-radius: 6px; font-size: 0.82rem; font-weight: 700; border: 1px solid #cbd5e1; background: {% if order.payment_status == 'Paid' %}#f0fdf4; color: #15803d;{% elif order.payment_status == 'Failed' %}#fef2f2; color: #b91c1c;{% else %}#fffbeb; color: #b45309;{% endif %}">
+                                {% for p_code, p_name in payment_choices %}
+                                <option value="{{ p_code }}" {% if order.payment_status == p_code %}selected{% endif %}>{{ p_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                    </td>
+                    <td>
+                        <form method="POST" action="{% url 'store:update_order_status' order_id=order.id %}" style="margin: 0;">
+                            {% csrf_token %}
+                            <input type="hidden" name="order_id" value="{{ order.id }}">
+                            <select name="order_status" onchange="this.form.submit()" style="padding: 6px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; border: 1px solid #cbd5e1; background: {% if order.order_status == 'Delivered' %}#f0fdf4; color: #15803d;{% elif order.order_status == 'Cancelled' %}#fef2f2; color: #b91c1c;{% elif order.order_status == 'Shipped' %}#eff6ff; color: #1d4ed8;{% else %}#fffbeb; color: #b45309;{% endif %}">
+                                {% for s_code, s_name in status_choices %}
+                                <option value="{{ s_code }}" {% if order.order_status == s_code %}selected{% endif %}>{{ s_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" style="text-align: center; color: #94a3b8; padding: 40px;">
+                        No orders match your criteria.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if orders.has_other_pages %}
+    <div style="display: flex; justify-content: center; gap: 8px; margin-top: 24px;">
+        {% if orders.has_previous %}
+            <a href="?page={{ orders.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="admin-btn admin-btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;">
+                <i class="fas fa-chevron-left"></i> Previous
+            </a>
+        {% endif %}
+
+        <span style="display: inline-flex; align-items: center; padding: 0 12px; font-size: 0.88rem; color: #64748b;">
+            Page {{ orders.number }} of {{ orders.paginator.num_pages }}
+        </span>
+
+        {% if orders.has_next %}
+            <a href="?page={{ orders.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" class="admin-btn admin-btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;">
+                Next <i class="fas fa-chevron-right"></i>
+            </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

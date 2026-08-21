@@ -1,0 +1,131 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}Shopping Cart - FreshCart{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 20px 0 60px;">
+    <h1 style="font-size: 2rem; font-weight: 800; color: var(--text-main); margin-bottom: 24px; display: flex; align-items: center; gap: 12px;">
+        <i class="fas fa-shopping-basket" style="color: var(--primary);"></i> Your Shopping Cart
+    </h1>
+
+    {% if cart_items %}
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px; align-items: start;">
+        <!-- Cart Items Table / List -->
+        <div style="background: #ffffff; border-radius: var(--radius-xl); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); overflow: hidden;">
+            <div style="padding: 20px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-weight: 700; color: var(--text-main); font-size: 1.1rem;">
+                    Items ({{ cart.total_items }})
+                </span>
+                <a href="{% url 'store:clear_cart' %}" onclick="return confirm('Clear all items from your cart?')" style="color: var(--danger); font-size: 0.88rem; font-weight: 600;">
+                    <i class="fas fa-trash-can"></i> Clear Cart
+                </a>
+            </div>
+
+            <div style="display: flex; flex-direction: column;">
+                {% for item in cart_items %}
+                <div style="display: grid; grid-template-columns: auto 1fr auto auto auto; gap: 20px; align-items: center; padding: 20px 24px; border-bottom: 1px solid var(--border-color);">
+                    <!-- Item Image -->
+                    <a href="{% url 'store:product_detail' slug=item.product.slug %}" style="width: 70px; height: 70px; background: #f8fafc; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid var(--border-color);">
+                        {% if item.product.image %}
+                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                        {% else %}
+                            <i class="fas fa-basket-shopping" style="color: var(--primary); font-size: 1.5rem;"></i>
+                        {% endif %}
+                    </a>
+
+                    <!-- Item Name & Category -->
+                    <div>
+                        <div style="font-size: 0.8rem; font-weight: 600; color: var(--primary);">{{ item.product.category.name }}</div>
+                        <a href="{% url 'store:product_detail' slug=item.product.slug %}" style="font-size: 1.05rem; font-weight: 700; color: var(--text-main); line-height: 1.3;">
+                            {{ item.product.name }}
+                        </a>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">
+                            ₹{{ item.product.final_price|floatformat:2 }} / {{ item.product.get_unit_display }}
+                        </div>
+                    </div>
+
+                    <!-- Quantity Adjuster -->
+                    <div style="display: flex; align-items: center; border: 1px solid var(--border-color); border-radius: var(--radius-sm); overflow: hidden;">
+                        <form action="{% url 'store:update_cart' item_id=item.id %}" method="POST" style="margin:0;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="decrease">
+                            <button type="submit" style="border:none; background:#f8fafc; padding:6px 10px; cursor:pointer; color:var(--text-main);"><i class="fas fa-minus" style="font-size: 0.75rem;"></i></button>
+                        </form>
+                        <span style="padding: 6px 12px; font-weight: 700; font-size: 0.95rem;">{{ item.quantity }}</span>
+                        <form action="{% url 'store:update_cart' item_id=item.id %}" method="POST" style="margin:0;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="increase">
+                            <button type="submit" style="border:none; background:#f8fafc; padding:6px 10px; cursor:pointer; color:var(--text-main);"><i class="fas fa-plus" style="font-size: 0.75rem;"></i></button>
+                        </form>
+                    </div>
+
+                    <!-- Item Subtotal -->
+                    <div style="font-size: 1.15rem; font-weight: 800; color: var(--text-main); min-width: 80px; text-align: right;">
+                        ₹{{ item.subtotal|floatformat:2 }}
+                    </div>
+
+                    <!-- Remove Item Button -->
+                    <div>
+                        <a href="{% url 'store:remove_from_cart' item_id=item.id %}" title="Remove item" style="color: #94a3b8; padding: 6px; font-size: 1.1rem; transition: color 0.2s;" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='#94a3b8'">
+                            <i class="fas fa-trash-can"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Order Summary Card -->
+        <div style="background: #ffffff; border-radius: var(--radius-xl); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); padding: 24px;">
+            <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--text-main); margin-bottom: 20px;">Order Summary</h2>
+
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.95rem; color: var(--text-muted);">
+                <span>Subtotal</span>
+                <span style="font-weight: 700; color: var(--text-main);">₹{{ cart.subtotal|floatformat:2 }}</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.95rem; color: var(--text-muted);">
+                <span>Delivery Fee</span>
+                {% if cart.shipping_fee > 0 %}
+                    <span style="font-weight: 700; color: var(--text-main);">₹{{ cart.shipping_fee|floatformat:2 }}</span>
+                {% else %}
+                    <span style="font-weight: 700; color: var(--success);"><i class="fas fa-gift"></i> FREE</span>
+                {% endif %}
+            </div>
+
+            {% if cart.subtotal < 500 and cart.subtotal > 0 %}
+            <div style="background: #f0fdf4; border: 1px dashed #86efac; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 0.85rem; color: #166534; margin: 16px 0;">
+                <i class="fas fa-circle-info"></i> Free delivery on orders over ₹500!
+            </div>
+            {% endif %}
+
+            <div style="display: flex; justify-content: space-between; margin-top: 16px; padding-top: 16px; border-top: 2px solid var(--border-color); font-size: 1.25rem; font-weight: 800; color: var(--text-main);">
+                <span>Total Amount</span>
+                <span style="color: var(--primary);">₹{{ cart.grand_total|floatformat:2 }}</span>
+            </div>
+
+            <a href="{% url 'store:checkout' %}" class="btn btn-primary btn-lg" style="width: 100%; justify-content: center; margin-top: 24px; box-shadow: var(--shadow-md);">
+                <i class="fas fa-lock"></i> Proceed to Checkout
+            </a>
+
+            <a href="{% url 'store:product_list' %}" style="display: block; text-align: center; margin-top: 14px; font-size: 0.9rem; font-weight: 600; color: var(--text-muted);">
+                <i class="fas fa-arrow-left"></i> Continue Shopping
+            </a>
+        </div>
+    </div>
+    {% else %}
+    <!-- Empty Cart View -->
+    <div style="text-align: center; padding: 80px 20px; background: #fff; border-radius: var(--radius-xl); border: 1px solid var(--border-color); max-width: 550px; margin: 20px auto;">
+        <div style="font-size: 4rem; color: #94a3b8; margin-bottom: 20px;">
+            <i class="fas fa-cart-shopping"></i>
+        </div>
+        <h2 style="font-weight: 800; margin-bottom: 10px;">Your cart is empty</h2>
+        <p style="color: var(--text-muted); margin-bottom: 24px;">Looks like you haven't added any fresh groceries to your cart yet.</p>
+        <a href="{% url 'store:product_list' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-shopping-basket"></i> Browse Groceries
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

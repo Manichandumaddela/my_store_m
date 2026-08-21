@@ -1,0 +1,165 @@
+{% extends 'store/admin/base_admin.html' %}
+{% load static %}
+
+{% block admin_title %}Store Analytics & Dashboard{% endblock %}
+
+{% block admin_content %}
+<div class="admin-content-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+        <div>
+            <h1 style="font-size: 1.6rem; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-chart-pie" style="color: var(--admin-primary);"></i> Store Analytics & Dashboard
+            </h1>
+            <p style="color: #64748b; font-size: 0.9rem; margin-top: 4px;">Welcome back, <strong>{{ request.user.username }}</strong>! Real-time overview of store operations.</p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <a href="{% url 'store:add_product' %}" class="admin-btn admin-btn-primary">
+                <i class="fas fa-plus"></i> New Product
+            </a>
+            <a href="{% url 'store:sales_report' %}" class="admin-btn admin-btn-secondary">
+                <i class="fas fa-file-invoice-dollar"></i> View Report
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Metrics KPI Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+        <div style="background: #eff6ff; border-radius: 12px; padding: 20px; border-left: 4px solid #3b82f6;">
+            <div style="font-size: 0.85rem; font-weight: 700; color: #1d4ed8; text-transform: uppercase;">Total Revenue</div>
+            <div style="font-size: 1.8rem; font-weight: 800; color: #1e3a8a; margin-top: 4px;">₹{{ total_revenue|floatformat:2 }}</div>
+            <div style="font-size: 0.8rem; color: #3b82f6; margin-top: 4px;"><i class="fas fa-circle-check"></i> Paid Orders</div>
+        </div>
+
+        <div style="background: #f0fdf4; border-radius: 12px; padding: 20px; border-left: 4px solid #10b981;">
+            <div style="font-size: 0.85rem; font-weight: 700; color: #047857; text-transform: uppercase;">Total Orders</div>
+            <div style="font-size: 1.8rem; font-weight: 800; color: #064e3b; margin-top: 4px;">{{ total_orders }}</div>
+            <div style="font-size: 0.8rem; color: #10b981; margin-top: 4px;">{{ delivered_orders }} completed</div>
+        </div>
+
+        <div style="background: #fffbeb; border-radius: 12px; padding: 20px; border-left: 4px solid #f59e0b;">
+            <div style="font-size: 0.85rem; font-weight: 700; color: #b45309; text-transform: uppercase;">Pending Orders</div>
+            <div style="font-size: 1.8rem; font-weight: 800; color: #78350f; margin-top: 4px;">{{ pending_orders }}</div>
+            <div style="font-size: 0.8rem; color: #f59e0b; margin-top: 4px;">Needs processing</div>
+        </div>
+
+        <div style="background: #fdf2f8; border-radius: 12px; padding: 20px; border-left: 4px solid #ec4899;">
+            <div style="font-size: 0.85rem; font-weight: 700; color: #be185d; text-transform: uppercase;">Active Products</div>
+            <div style="font-size: 1.8rem; font-weight: 800; color: #831843; margin-top: 4px;">{{ total_products }}</div>
+            <div style="font-size: 0.8rem; color: #ec4899; margin-top: 4px;">{{ low_stock_count }} low in stock</div>
+        </div>
+    </div>
+
+    <!-- Revenue Analytics Chart -->
+    <div style="background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px; margin-bottom: 30px;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-bottom: 16px;">
+            <i class="fas fa-chart-line" style="color: var(--admin-primary);"></i> Revenue Trends (Last 7 Days)
+        </h3>
+        <div style="height: 280px; position: relative;">
+            <canvas id="salesTrendsChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Recent Orders Table -->
+    <div style="background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+            <h3 style="font-size: 1.1rem; font-weight: 700; color: #1e293b;">
+                <i class="fas fa-clock-rotate-left" style="color: var(--admin-primary);"></i> Recent Orders
+            </h3>
+            <a href="{% url 'store:manage_orders' %}" style="font-size: 0.88rem; font-weight: 600; color: var(--admin-primary);">
+                View All Orders <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Order #</th>
+                        <th>Customer</th>
+                        <th>Items</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Payment</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                    <tr>
+                        <td><strong>#{{ order.order_number }}</strong></td>
+                        <td>{{ order.full_name }}</td>
+                        <td>{{ order.total_items_count }} items</td>
+                        <td><strong>₹{{ order.grand_total|floatformat:2 }}</strong></td>
+                        <td>
+                            <span class="status-badge status-{{ order.order_status|lower }}">
+                                {{ order.order_status }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-badge {% if order.payment_status == 'Paid' %}status-delivered{% else %}status-pending{% endif %}">
+                                {{ order.payment_status }}
+                            </span>
+                        </td>
+                        <td style="color: #64748b; font-size: 0.85rem;">{{ order.created_at|date:"M d, H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: #94a3b8; padding: 30px;">
+                            No recent orders to show.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('salesTrendsChart');
+        if (ctx) {
+            const labels = {{ days_labels_json|safe }};
+            const data = {{ daily_sales_json|safe }};
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Daily Sales (₹)',
+                        data: data,
+                        borderColor: '#059669',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#059669'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9' },
+                            ticks: {
+                                callback: function(value) { return '₹' + value; }
+                            }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

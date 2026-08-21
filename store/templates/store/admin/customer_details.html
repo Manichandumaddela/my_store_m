@@ -1,0 +1,78 @@
+{% extends 'store/admin/base_admin.html' %}
+{% load static %}
+
+{% block admin_title %}Customer Directory - FreshCart Admin{% endblock %}
+
+{% block admin_content %}
+<div class="admin-content-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+        <div>
+            <h1 style="font-size: 1.5rem; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-users" style="color: var(--admin-primary);"></i> Registered Customers ({{ total_customers }})
+            </h1>
+            <p style="color: #64748b; font-size: 0.9rem; margin-top: 4px;">View customer activity, order history, lifetime value, and contact profiles.</p>
+        </div>
+    </div>
+
+    <!-- Customer Directory Table -->
+    <div style="overflow-x: auto;">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Email & Phone</th>
+                    <th>Location</th>
+                    <th>Orders Placed</th>
+                    <th>Lifetime Spent</th>
+                    <th>Joined Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for customer in customers %}
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 38px; height: 38px; border-radius: 50%; background: #e0e7ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem;">
+                                {{ customer.username|slice:":1"|upper }}
+                            </div>
+                            <div>
+                                <strong style="color: #1e293b; font-size: 0.95rem;">{{ customer.get_full_name|default:customer.username }}</strong>
+                                <div style="font-size: 0.8rem; color: #64748b;">@{{ customer.username }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="font-size: 0.88rem; color: #1e293b;">{{ customer.email }}</div>
+                        <div style="font-size: 0.82rem; color: #64748b;">{{ customer.profile.phone|default:'No phone' }}</div>
+                    </td>
+                    <td>
+                        <span style="font-size: 0.85rem; color: #64748b;">
+                            {% if customer.profile.city %}{{ customer.profile.city }}{% else %}Not specified{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge status-delivered">
+                            {{ customer.order_count|default:0 }} orders
+                        </span>
+                    </td>
+                    <td>
+                        <strong style="color: var(--admin-primary); font-size: 0.95rem;">
+                            ₹{{ customer.total_spent|default:0|floatformat:2 }}
+                        </strong>
+                    </td>
+                    <td style="color: #64748b; font-size: 0.85rem;">
+                        {{ customer.date_joined|date:"M d, Y" }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; color: #94a3b8; padding: 40px;">
+                        No registered customer accounts found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

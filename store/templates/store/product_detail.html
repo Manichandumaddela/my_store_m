@@ -1,0 +1,153 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - FreshCart{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 20px;">
+    <!-- Breadcrumbs -->
+    <nav style="display: flex; gap: 8px; align-items: center; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 24px;">
+        <a href="{% url 'store:home' %}" style="color: var(--primary); font-weight: 600;"><i class="fas fa-home"></i> Home</a>
+        <i class="fas fa-chevron-right" style="font-size: 0.75rem;"></i>
+        <a href="{% url 'store:product_list' %}" style="color: var(--primary); font-weight: 600;">Products</a>
+        <i class="fas fa-chevron-right" style="font-size: 0.75rem;"></i>
+        <a href="{% url 'store:product_list' %}?category={{ product.category.slug }}" style="color: var(--text-muted);">{{ product.category.name }}</a>
+        <i class="fas fa-chevron-right" style="font-size: 0.75rem;"></i>
+        <span style="color: var(--text-main); font-weight: 600;">{{ product.name }}</span>
+    </nav>
+
+    <!-- Product Detail Container -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 48px; background: #ffffff; border-radius: var(--radius-xl); padding: 40px; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+        <!-- Product Image Gallery / Main Image -->
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f8fafc; border-radius: var(--radius-lg); padding: 30px; position: relative;">
+            {% if product.discount_percent > 0 %}
+                <span class="badge-discount" style="position: absolute; top: 20px; left: 20px; font-size: 1rem; padding: 6px 14px;">-{{ product.discount_percent }}% OFF</span>
+            {% endif %}
+
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-width: 100%; max-height: 420px; object-fit: contain; border-radius: var(--radius-md);">
+            {% else %}
+                <div style="font-size: 8rem; color: #10b981; opacity: 0.85; padding: 60px 0;">
+                    <i class="fas fa-basket-shopping"></i>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Product Information -->
+        <div style="display: flex; flex-direction: column; justify-content: center;">
+            <div style="display: inline-block; background: var(--primary-light); color: var(--primary); font-size: 0.85rem; font-weight: 700; padding: 4px 12px; border-radius: 999px; width: fit-content; margin-bottom: 12px;">
+                {{ product.category.name }}
+            </div>
+
+            <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--text-main); line-height: 1.2; margin-bottom: 8px;">
+                {{ product.name }}
+            </h1>
+
+            <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 20px;">
+                Unit: <strong>{{ product.get_unit_display }}</strong>
+            </p>
+
+            <!-- Price Row -->
+            <div style="display: flex; align-items: baseline; gap: 16px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
+                <span style="font-size: 2.4rem; font-weight: 800; color: var(--primary);">₹{{ product.final_price|floatformat:2 }}</span>
+                {% if product.discount_price and product.discount_price < product.price %}
+                    <span style="font-size: 1.4rem; color: var(--text-muted); text-decoration: line-through;">₹{{ product.price|floatformat:2 }}</span>
+                    <span style="background: #fee2e2; color: #dc2626; font-size: 0.85rem; font-weight: 700; padding: 3px 8px; border-radius: 6px;">Save ₹{{ product.price|floatformat:2 }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Stock Status -->
+            <div style="margin-bottom: 24px;">
+                {% if product.in_stock %}
+                    <div style="display: flex; align-items: center; gap: 8px; color: var(--success); font-weight: 600; font-size: 0.95rem;">
+                        <i class="fas fa-check-circle"></i> In Stock ({{ product.stock }} items available)
+                    </div>
+                {% else %}
+                    <div style="display: flex; align-items: center; gap: 8px; color: var(--danger); font-weight: 600; font-size: 0.95rem;">
+                        <i class="fas fa-times-circle"></i> Currently Out of Stock
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Description -->
+            <div style="color: #475569; font-size: 1rem; line-height: 1.7; margin-bottom: 32px;">
+                {{ product.description|linebreaks }}
+            </div>
+
+            <!-- Purchase / Cart Actions -->
+            {% if product.in_stock %}
+            <form action="{% url 'store:add_to_cart' product_id=product.id %}" method="POST" style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+                {% csrf_token %}
+                <div style="display: flex; align-items: center; border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden; background: #f8fafc;">
+                    <button type="button" onclick="let q=document.getElementById('productQty'); if(q.value>1) q.value--;" style="border: none; background: transparent; padding: 12px 18px; cursor: pointer; font-size: 1.1rem; color: var(--text-main);"><i class="fas fa-minus"></i></button>
+                    <input type="number" id="productQty" name="quantity" value="1" min="1" max="{{ product.stock }}" style="width: 50px; text-align: center; border: none; background: transparent; font-weight: 700; font-size: 1.1rem; outline: none;">
+                    <button type="button" onclick="let q=document.getElementById('productQty'); if(q.value<{{ product.stock }}) q.value++;" style="border: none; background: transparent; padding: 12px 18px; cursor: pointer; font-size: 1.1rem; color: var(--text-main);"><i class="fas fa-plus"></i></button>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg" style="flex: 1; justify-content: center; box-shadow: var(--shadow-md);">
+                    <i class="fas fa-cart-plus"></i> Add to Cart
+                </button>
+            </form>
+            {% else %}
+            <button class="btn btn-primary btn-lg" style="background: #94a3b8; cursor: not-allowed; justify-content: center;" disabled>
+                <i class="fas fa-ban"></i> Out of Stock
+            </button>
+            {% endif %}
+
+            <!-- Guarantee Features -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border-color);">
+                <div style="display: flex; align-items: center; gap: 10px; font-size: 0.88rem; color: var(--text-muted);">
+                    <i class="fas fa-truck-fast" style="color: var(--primary); font-size: 1.2rem;"></i>
+                    <span>Same day express delivery</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; font-size: 0.88rem; color: var(--text-muted);">
+                    <i class="fas fa-seedling" style="color: var(--primary); font-size: 1.2rem;"></i>
+                    <span>100% Quality organic guarantee</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    {% if related_products %}
+    <div style="margin-top: 50px; margin-bottom: 20px;">
+        <h3 class="section-title">Similar Fresh Items</h3>
+        <p class="section-subtitle">Customers who looked at this item also bought</p>
+        
+        <div class="product-grid" style="margin-top: 20px;">
+            {% for rel_prod in related_products %}
+            <div class="product-card">
+                <a href="{% url 'store:product_detail' slug=rel_prod.slug %}" class="product-img-wrapper">
+                    {% if rel_prod.image %}
+                        <img src="{{ rel_prod.image.url }}" alt="{{ rel_prod.name }}" loading="lazy">
+                    {% else %}
+                        <div style="font-size: 3.5rem; color: #10b981; opacity: 0.85;">
+                            <i class="fas fa-basket-shopping"></i>
+                        </div>
+                    {% endif %}
+                </a>
+                <div class="product-info">
+                    <div class="product-category">{{ rel_prod.category.name }}</div>
+                    <a href="{% url 'store:product_detail' slug=rel_prod.slug %}" class="product-name">{{ rel_prod.name }}</a>
+                    <div class="product-bottom-row">
+                        <div class="price-box">
+                            <span class="current-price">₹{{ rel_prod.final_price|floatformat:2 }}</span>
+                        </div>
+                        {% if rel_prod.in_stock %}
+                            <form action="{% url 'store:add_to_cart' product_id=rel_prod.id %}" method="POST" style="margin:0;">
+                                {% csrf_token %}
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="btn-add-cart" title="Add to Cart">
+                                    <i class="fas fa-cart-plus"></i> Add
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

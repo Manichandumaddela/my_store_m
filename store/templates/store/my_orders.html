@@ -1,0 +1,86 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}My Orders - FreshCart{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 20px 0 60px;">
+    <h1 style="font-size: 2rem; font-weight: 800; color: var(--text-main); margin-bottom: 24px; display: flex; align-items: center; gap: 12px;">
+        <i class="fas fa-box-open" style="color: var(--primary);"></i> My Order History
+    </h1>
+
+    {% if orders %}
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+        {% for order in orders %}
+        <div style="background: #ffffff; border-radius: var(--radius-xl); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); overflow: hidden; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+            <!-- Order Card Header -->
+            <div style="background: #f8fafc; padding: 18px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                <div style="display: flex; gap: 24px; align-items: center; flex-wrap: wrap;">
+                    <div>
+                        <span style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Order Placed</span>
+                        <div style="font-weight: 700; color: var(--text-main); font-size: 0.92rem;">{{ order.created_at|date:"M d, Y" }}</div>
+                    </div>
+                    <div>
+                        <span style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Total</span>
+                        <div style="font-weight: 800; color: var(--primary); font-size: 0.95rem;">₹{{ order.grand_total|floatformat:2 }}</div>
+                    </div>
+                    <div>
+                        <span style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Ship To</span>
+                        <div style="font-weight: 600; color: var(--text-main); font-size: 0.92rem;">{{ order.full_name }}</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 0.85rem; font-weight: 700; padding: 4px 12px; border-radius: 999px; background: {% if order.order_status == 'Delivered' %}#dcfce7; color: #166534;{% elif order.order_status == 'Shipped' %}#eff6ff; color: #1d4ed8;{% elif order.order_status == 'Cancelled' %}#fef2f2; color: #991b1b;{% else %}#fffbeb; color: #b45309;{% endif %}">
+                        <i class="fas fa-circle" style="font-size: 0.5rem;"></i> {{ order.order_status }}
+                    </span>
+                    <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">#{{ order.order_number }}</span>
+                </div>
+            </div>
+
+            <!-- Order Card Body -->
+            <div style="padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+                <div style="display: flex; flex-direction: column; gap: 10px; flex: 1;">
+                    {% for item in order.items.all|slice:":3" %}
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 38px; height: 38px; background: #f8fafc; border-radius: 6px; display: flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0; font-size: 0.9rem; color: var(--primary);">
+                            <i class="fas fa-basket-shopping"></i>
+                        </div>
+                        <div>
+                            <span style="font-weight: 700; color: var(--text-main); font-size: 0.92rem;">{{ item.product_name }}</span>
+                            <span style="font-size: 0.82rem; color: var(--text-muted); margin-left: 6px;">(Qty: {{ item.quantity }} × ₹{{ item.price|floatformat:2 }})</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    {% if order.items.count > 3 %}
+                    <span style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">
+                        + {{ order.items.count|add:"-3" }} more item{{ order.items.count|add:"-3"|pluralize }}
+                    </span>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <a href="{% url 'store:order_summary' order_number=order.order_number %}" class="btn btn-outline btn-sm">
+                        <i class="fas fa-receipt"></i> View Invoice Details
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- Empty Orders -->
+    <div style="text-align: center; padding: 80px 20px; background: #fff; border-radius: var(--radius-xl); border: 1px solid var(--border-color); max-width: 500px; margin: 20px auto;">
+        <div style="font-size: 3.5rem; color: #94a3b8; margin-bottom: 16px;">
+            <i class="fas fa-box-open"></i>
+        </div>
+        <h2 style="font-weight: 800; margin-bottom: 8px;">No orders found</h2>
+        <p style="color: var(--text-muted); margin-bottom: 24px;">You haven't placed any orders yet. Fresh groceries are waiting for you!</p>
+        <a href="{% url 'store:product_list' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-shopping-basket"></i> Start Shopping
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

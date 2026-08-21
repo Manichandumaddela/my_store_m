@@ -1,0 +1,57 @@
+{% extends 'store/admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Add Category{% endblock %}
+
+{% block admin_content %}
+<div class="add-category">
+    <div class="admin-header">
+        <h1><i class="fas fa-plus-circle"></i> Add New Category</h1>
+        <a href="{% url 'store:manage_categories' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+
+    <div class="form-container">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label for="{{ form.name.id_for_label }}">Category Name</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                    <small class="error">{{ form.name.errors }}</small>
+                    {% endif %}
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="{{ form.description.id_for_label }}">Description</label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                    <small class="error">{{ form.description.errors }}</small>
+                    {% endif %}
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="{{ form.image.id_for_label }}">Category Image</label>
+                    {{ form.image }}
+                    <small class="help-text">Upload a representative image for this category</small>
+                    {% if form.image.errors %}
+                    <small class="error">{{ form.image.errors }}</small>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Create Category
+                </button>
+                <a href="{% url 'store:manage_categories' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

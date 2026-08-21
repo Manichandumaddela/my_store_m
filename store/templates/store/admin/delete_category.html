@@ -1,0 +1,48 @@
+{% extends 'store/admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Delete Category{% endblock %}
+
+{% block admin_content %}
+<div class="delete-category">
+    <div class="admin-header">
+        <h1><i class="fas fa-trash-alt"></i> Delete Category</h1>
+        <a href="{% url 'store:manage_categories' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+
+    <div class="delete-confirmation">
+        <div class="warning-box">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h2>Are you sure you want to delete this category?</h2>
+
+            <div class="category-info">
+                <p><strong>Category Name:</strong> {{ category.name }}</p>
+                {% if category.description %}
+                <p><strong>Description:</strong> {{ category.description }}</p>
+                {% endif %}
+                <p><strong>Products in this category:</strong> {{ category.products.count }}</p>
+            </div>
+
+            <div class="warning-message">
+                <p><strong>Warning:</strong> This action cannot be undone. Products associated with this category will
+                    <strong>NOT</strong> be deleted, but they will no longer have a category assigned.
+                </p>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-actions" style="justify-content: center;">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-check"></i> Yes, Delete This Category
+                    </button>
+                    <a href="{% url 'store:manage_categories' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
