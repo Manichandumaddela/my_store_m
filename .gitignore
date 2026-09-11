@@ -13,6 +13,7 @@ env/
 db.sqlite3
 db.sqlite3-journal
 *.log
+staticfiles/
 
 # Media files (user uploads)
 media/

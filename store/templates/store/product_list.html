@@ -21,7 +21,7 @@
                 <a href="#shop-now" class="btn btn-primary btn-lg" style="background: #ffffff; color: #065f46; box-shadow: var(--shadow-lg);">
                     <i class="fas fa-shopping-basket"></i> Shop Now
                 </a>
-                <a href="{% url 'store:product_list' %}" class="btn btn-outline btn-lg" style="color: #fff; border-color: rgba(255,255,255,0.4);">
+                <a href="{% url 'store:product_list' %}" class="btn btn-outline-light btn-lg">
                     Explore Catalog
                 </a>
             </div>
@@ -102,31 +102,32 @@
             </a>
 
             <!-- Product Details -->
-            <div class="product-info">
-                <div class="product-category">{{ product.category.name }}</div>
-                <a href="{% url 'store:product_detail' slug=product.slug %}" class="product-name">
+            <div class="product-info" style="padding: 16px 18px 18px; display: flex; flex-direction: column; flex: 1;">
+                <div class="product-category" style="font-size: 0.78rem; font-weight: 700; color: var(--primary); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">
+                    {{ product.category.name }}
+                </div>
+                <a href="{% url 'store:product_detail' slug=product.slug %}" class="product-name" style="font-size: 1.05rem; font-weight: 700; color: var(--text-main); line-height: 1.35; margin-bottom: 6px; text-decoration: none;">
                     {{ product.name }}
                 </a>
-                <div class="product-unit">{{ product.get_unit_display }}</div>
+                <div class="product-unit" style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px;">
+                    {{ product.get_unit_display }}
+                </div>
 
-                <div class="product-bottom-row">
+                <div class="product-bottom-row" style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 12px; border-top: 1px solid #f1f5f9;">
                     <div class="price-box">
-                        <span class="current-price">₹{{ product.final_price|floatformat:2 }}</span>
-                        {% if product.discount_price and product.discount_price < product.price %}
-                            <span class="old-price">₹{{ product.price|floatformat:2 }}</span>
-                        {% endif %}
+                        <span class="current-price" style="font-size: 1.3rem; font-weight: 800; color: var(--primary);">₹{{ product.final_price|floatformat:2 }}</span>
                     </div>
 
                     {% if product.in_stock %}
                         <form action="{% url 'store:add_to_cart' product_id=product.id %}" method="POST" style="margin: 0;">
                             {% csrf_token %}
                             <input type="hidden" name="quantity" value="1">
-                            <button type="submit" class="btn-add-cart ajax-add-to-cart" title="Add to Cart" id="addCartBtn_{{ product.id }}">
+                            <button type="submit" class="btn btn-primary btn-sm btn-add-cart ajax-add-to-cart" title="Add to Cart" id="addCartBtn_{{ product.id }}" style="padding: 7px 16px; border-radius: 999px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
                                 <i class="fas fa-cart-plus"></i> Add
                             </button>
                         </form>
                     {% else %}
-                        <span style="font-size: 0.8rem; font-weight: 700; color: var(--danger); background: var(--danger-light); padding: 4px 8px; border-radius: var(--radius-sm);">
+                        <span style="font-size: 0.8rem; font-weight: 700; color: var(--danger); background: var(--danger-light); padding: 4px 10px; border-radius: var(--radius-sm);">
                             Out of Stock
                         </span>
                     {% endif %}

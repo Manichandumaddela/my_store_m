@@ -87,6 +87,12 @@ class Product(models.Model):
         return 0
 
     @property
+    def savings(self):
+        if self.discount_price is not None and self.discount_price > 0 and self.discount_price < self.price:
+            return self.price - self.discount_price
+        return 0
+
+    @property
     def in_stock(self):
         return self.stock > 0 and self.is_available
 
@@ -190,6 +196,10 @@ class Order(models.Model):
         if not self.order_number:
             self.order_number = f"ORD-{uuid.uuid4().hex[:8].upper()}"
         super().save(*args, **kwargs)
+
+    @property
+    def total_items_count(self):
+        return sum(item.quantity for item in self.items.all())
 
     def __str__(self):
         return f"Order {self.order_number} - {self.full_name}"

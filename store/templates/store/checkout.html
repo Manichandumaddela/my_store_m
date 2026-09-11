@@ -9,9 +9,9 @@
         <i class="fas fa-shield-check" style="color: var(--primary);"></i> Express Checkout
     </h1>
 
-    <div style="display: grid; grid-template-columns: 3fr 2fr; gap: 32px; align-items: start;">
+    <div class="checkout-layout-grid">
         <!-- Shipping & Payment Form -->
-        <div style="background: #ffffff; border-radius: var(--radius-xl); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); padding: 32px;">
+        <div class="checkout-form-card">
             <form method="POST" action="{% url 'store:checkout' %}" id="checkoutForm">
                 {% csrf_token %}
 
@@ -22,7 +22,7 @@
                         Delivery Information
                     </h2>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                    <div class="form-row-2col">
                         <div class="form-group">
                             <label class="form-label" for="{{ form.full_name.id_for_label }}">Full Name *</label>
                             {{ form.full_name }}
@@ -47,7 +47,7 @@
                         {% if form.address.errors %}<span style="color: var(--danger); font-size: 0.8rem;">{{ form.address.errors.0 }}</span>{% endif %}
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-row-2col">
                         <div class="form-group">
                             <label class="form-label" for="{{ form.city.id_for_label }}">City *</label>
                             {{ form.city }}
@@ -60,6 +60,7 @@
                         </div>
                     </div>
                 </div>
+
 
                 <!-- Step 2: Payment Option -->
                 <div style="margin-bottom: 30px; padding-top: 24px; border-top: 1px solid var(--border-color);">
@@ -95,7 +96,7 @@
         </div>
 
         <!-- Order Items Review Box -->
-        <div style="background: #ffffff; border-radius: var(--radius-xl); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); padding: 28px;">
+        <div class="checkout-summary-card">
             <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 18px;">Items in Your Order</h3>
 
             <div style="max-height: 280px; overflow-y: auto; margin-bottom: 20px; padding-right: 6px;">

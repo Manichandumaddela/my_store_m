@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+    FreshCart - Fresh Organic Groceries & Farm Produce
+</title>
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <link rel="stylesheet" href="/static/css/style.css">
+    
+</head>
+<body>
+    <!-- Top Announcement Bar -->
+    <div class="announcement-bar">
+        <div class="container announcement-content">
+            <div>
+                <i class="fas fa-truck-fast"></i> Free express delivery on orders over ₹499 • Use code <span class="promo-pill">FRESH30</span>
+            </div>
+            <div style="display: flex; gap: 16px; align-items: center;">
+                <span class="delivery-city"><i class="fas fa-location-dot"></i> Delivering to: <strong>All Locations</strong></span>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <header class="main-header">
+        <div class="container navbar-container">
+            <!-- Brand Logo -->
+            <a href="/" class="brand-logo">
+                <i class="fas fa-leaf" style="color: var(--primary);"></i>
+                <span>Fresh<strong>Cart</strong></span>
+            </a>
+
+            <!-- Search Bar Form -->
+            <form action="/products/" method="GET" class="header-search-form">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" name="q" value="" placeholder="Search fresh vegetables, fruits, dairy, bakery..." autocomplete="off">
+                <button type="submit" class="btn-search">Search</button>
+            </form>
+
+            <!-- Action Navigation Icons -->
+            <nav class="header-actions">
+                <a href="/products/" class="nav-btn-icon" title="Browse Catalog">
+                    <i class="fas fa-shapes"></i>
+                    <span>Products</span>
+                </a>
+
+                
+                    <a href="/cart/" class="cart-pill-btn" id="headerCartBtn">
+                        <i class="fas fa-shopping-basket"></i>
+                        <span class="cart-count-badge" id="cartCountBadge">0</span>
+                        <span class="cart-label">Cart</span>
+                    </a>
+                    <a href="/accounts/login/" class="btn btn-outline btn-sm">Sign In</a>
+                    <a href="/accounts/register/" class="btn btn-primary btn-sm">Register</a>
+                
+            </nav>
+        </div>
+
+        <!-- Category Horizontal Nav Ribbon -->
+        <div class="category-ribbon">
+            <div class="container category-list">
+                <a href="/products/" class="category-chip active">
+                    <i class="fas fa-border-all"></i> All Items
+                </a>
+                
+                <a href="/products/?category=bakery-fresh-bread" class="category-chip ">
+                    <i class="fas fa-bread-slice"></i> Bakery &amp; Fresh Bread
+                </a>
+                
+                <a href="/products/?category=beverages-juices" class="category-chip ">
+                    <i class="fas fa-bottle-water"></i> Beverages &amp; Juices
+                </a>
+                
+                <a href="/products/?category=cat1" class="category-chip ">
+                    <i class="fas fa-leaf"></i> Cat1
+                </a>
+                
+                <a href="/products/?category=dairy-milk-eggs" class="category-chip ">
+                    <i class="fas fa-egg"></i> Dairy, Milk &amp; Eggs
+                </a>
+                
+                <a href="/products/?category=fresh-fruits-vegetables" class="category-chip ">
+                    <i class="fas fa-apple-whole"></i> Fresh Fruits &amp; Vegetables
+                </a>
+                
+                <a href="/products/?category=organic-grains-staples" class="category-chip ">
+                    <i class="fas fa-wheat-awn"></i> Organic Grains &amp; Staples
+                </a>
+                
+                <a href="/products/?category=snacks-packaged-food" class="category-chip ">
+                    <i class="fas fa-cookie"></i> Snacks &amp; Packaged Food
+                </a>
+                
+            </div>
+        </div>
+    </header>
+
+    <!-- Global Flash Alerts -->
+    
+
+    <!-- Main Content Block -->
+    <main class="page-body">
+        <div class="container">
+            
+    <!-- Hero Banner (Shown on Main Home View) -->
+    
+    <section class="hero-section">
+        <div class="hero-content">
+            <span class="hero-tag"><i class="fas fa-sparkles"></i> 100% Organic & Farm Fresh</span>
+            <h1 class="hero-title">Stay Healthy with <span>Fresh Grocery</span> Everyday</h1>
+            <p class="hero-desc">
+                Handpicked farm-fresh vegetables, organic fruits, artisan bakery, and daily dairy delivered in 30 minutes.
+            </p>
+            <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+                <a href="#shop-now" class="btn btn-primary btn-lg" style="background: #ffffff; color: #065f46; box-shadow: var(--shadow-lg);">
+                    <i class="fas fa-shopping-basket"></i> Shop Now
+                </a>
+                <a href="/products/" class="btn btn-outline-light btn-lg">
+                    Explore Catalog
+                </a>
+            </div>
+
+            <div class="hero-badges">
+                <div class="hero-badge-item">
+                    <i class="fas fa-shield-alt" style="color: #34d399;"></i> Certified Quality
+                </div>
+                <div class="hero-badge-item">
+                    <i class="fas fa-bolt" style="color: #fde047;"></i> 30-Min Fast Delivery
+                </div>
+                <div class="hero-badge-item">
+                    <i class="fas fa-undo" style="color: #6ee7b7;"></i> Easy Returns
+                </div>
+            </div>
+        </div>
+    </section>
+    
+
+    <!-- Catalog Header / Filter Bar -->
+    <div id="shop-now" class="section-header" style="margin-top: 10px;">
+        <div>
+            <h2 class="section-title">
+                
+                    Popular Fresh Groceries
+                
+            </h2>
+            <p class="section-subtitle">
+                Explore our selection of top-quality organic products and daily essentials
+            </p>
+        </div>
+
+        <!-- Sorting Selector Form -->
+        <form method="GET" action="" style="display: flex; align-items: center; gap: 10px;">
+            
+            
+            <label for="sort-select" style="font-size: 0.88rem; font-weight: 600; color: var(--text-muted); white-space: nowrap;">Sort by:</label>
+            <select id="sort-select" name="sort" class="form-select" style="padding: 6px 12px; font-size: 0.88rem;" onchange="this.form.submit()">
+                <option value="newest" >Newest First</option>
+                <option value="price-asc" >Price: Low to High</option>
+                <option value="price-desc" >Price: High to Low</option>
+                <option value="name" >Name (A-Z)</option>
+            </select>
+        </form>
+    </div>
+
+    <!-- Product Grid -->
+    
+    <div class="product-grid">
+        
+        <div class="product-card">
+            <!-- Badges -->
+            <div class="product-badge-group">
+                
+                
+            </div>
+
+            <!-- Product Image -->
+            <a href="/product/p1/" class="product-img-wrapper">
+                
+                    <!-- Fallback SVG icon -->
+                    <div style="font-size: 4rem; color: #10b981; opacity: 0.85;">
+                        <i class="fas fa-basket-shopping"></i>
+                    </div>
+                
+            </a>
+
+            <!-- Product Details -->
+            <div class="product-info">
+                <div class="product-category">Cat1</div>
+                <a href="/product/p1/" class="product-name">
+                    P1
+                </a>
+                <div class="product-unit">per piece / item</div>
+
+                <div class="product-bottom-row">
+                    <div class="price-box">
+                        <span class="current-price">₹10.00</span>
+                        
+                    </div>
+
+                    
+                        <form action="/cart/add/34/" method="POST" style="margin: 0;">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="GOdJaPTWZFlbYBBaryl1kzWcCBEGOA3r949yuVFZzjXkJIf2bjmpgfkZ1Ss4WjBd">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn-add-cart ajax-add-to-cart" title="Add to Cart" id="addCartBtn_34">
+                                <i class="fas fa-cart-plus"></i> Add
+                            </button>
+                        </form>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="product-card">
+            <!-- Badges -->
+            <div class="product-badge-group">
+                
+                    <span class="badge-discount">-5% OFF</span>
+                
+                
+            </div>
+
+            <!-- Product Image -->
+            <a href="/product/popcorn/" class="product-img-wrapper">
+                
+                    <img src="/media/products/Popcorn.webp" alt="Popcorn" loading="lazy">
+                
+            </a>
+
+            <!-- Product Details -->
+            <div class="product-info">
+                <div class="product-category">Snacks &amp; Packaged Food</div>
+                <a href="/product/popcorn/" class="product-name">
+                    Popcorn
+                </a>
+                <div class="product-unit">per packet</div>
+
+                <div class="product-bottom-row">
+                    <div class="price-box">
+                        <span class="current-price">₹95.00</span>
+                        
+                            <span class="old-price">₹100.00</span>
+                        
+                    </div>
+
+                    
+                        <form action="/cart/add/33/" method="POST" style="margin: 0;">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="GOdJaPTWZFlbYBBaryl1kzWcCBEGOA3r949yuVFZzjXkJIf2bjmpgfkZ1Ss4WjBd">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn-add-cart ajax-add-to-cart" title="Add to Cart" id="addCartBtn_33">
+                                <i class="fas fa-cart-plus"></i> Add
+                            </button>
+                        </form>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="product-card">
+            <!-- Badges -->
+            <div class="product-badge-group">
+                
+                    <span class="badge-discount">-14% OFF</span>
+                
+                
+            </div>
+
+            <!-- Product Image -->
+            <a href="/product/potato-chips/" class="product-img-wrapper">
+                
+                    <img src="/media/products/Potato_Chips.jpg" alt="Potato Chips" loading="lazy">
+                
+            </a>
+
+            <!-- Product Details -->
+            <div class="product-info">
+                <div class="product-category">Snacks &amp; Packaged Food</div>
+                <a href="/product/potato-chips/" class="product-name">
+                    Potato Chips
+                </a>
+                <div class="product-unit">per 500g</div>
+
+                <div class="product-bottom-row">
+                    <div class="price-box">
+                        <span class="current-price">₹30.00</span>
+                        
+                            <span class="old-price">₹35.00</span>
+                        
+                    </div>
+
+                    
+                        <form action="/cart/add/32/" method="POST" style="margin: 0;">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="GOdJaPTWZFlbYBBaryl1kzWcCBEGOA3r949yuVFZzjXkJIf2bjmpgfkZ1Ss4WjBd">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn-add-cart ajax-add-to-cart" title="Add to Cart" id="addCartBtn_32">
+                                <i class="fas fa-cart-plus"></i> Add
+                            </button>
+                        </form>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="product-card">
+            <!-- Badges -->
+            <div class="product-badge-group">
+                
+                    <span class="badge-discount">-19% OFF</span>
+                
+                
+            </div>
+
+            <!-- Product Image -->
+            <a href="/product/samosa/" class="product-img-wrapper">
+                
+                    <img src="/media/products/Samosa.jpg" alt="Samosa" loading="lazy">
+                
+            </a>
+
+            <!-- Product Details -->
+            <div class="product-info">
+                <div class="product-category">Snacks &amp; Packaged Food</div>
+                <a href="/product/samosa/" class="product-name">
+                    Samosa
+                </a>
+                <div class="product-unit">per piece / item</div>
+
+                <div class="product-bottom-row">
+                    <div class="price-box">
+                        <span class="current-price">₹12.15</span>
+                        
+                            <span class="old-price">₹15.00</span>
+                        
+                    </div>
+
+                    
+                        <form action="/cart/add/31/" method="POST" style="margin: 0;">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="GOdJaPTWZFlbYBBaryl1kzWcCBEGOA3r949yuVFZzjXkJIf2bjmpgfkZ1Ss4WjBd">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn-add-cart ajax-add-to-cart" title="Add to Cart" id="addCartBtn_31">
+                                <i class="fas fa-cart-plus"></i> Add
+                            </button>
+                        </form>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="product-card">
+            <!-- Badges -->
+            <div class="product-badge-group">
+                
+                    <span class="badge-discount">-6% OFF</span>
+                
+                
+            </div>
+
+            <!-- Product Image -->
+            <a href="/product/whole-peanuts/" class="product-img-wrapper">
+                
+                    <img src="/media/products/peanut11.webp" alt="Whole Peanuts" loading="lazy">
+                
+            </a>
+
+            <!-- Product Details -->
+            <div class="product-info">
+                <div class="product-category">Organic Grains &amp; Staples</div>
+                <a href="/product/whole-peanuts/" class="product-name">
+                    Whole Peanuts
+                </a>
+                <div class="product-unit">per kg</div>
+
+                <div class="product-bottom-row">
+                    <div class="price-box">
+                        <span class="current-price">₹75.00</span>
+                        
+                            <span class="old-price">₹80.00</span>
+                        
+                    </div>
+
+                    
+                        <form action="/cart/add/30/" method="POST" style="margin: 0;">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="GOdJaPTWZFlbYBBaryl1kzWcCBEGOA3r949yuVFZzjXkJIf2bjmpgfkZ1Ss4WjBd">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn-add-cart ajax-add-to-cart" title="Add to Cart" id="addCartBtn_30">
+                                <i class="fas fa-cart-plus"></i> Add
+                            </button>
+                        </form>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="product-card">
+            <!-- Badges -->
+            <div class="product-badge-group">
+                
+                    <span class="badge-discount">-12% OFF</span>
+                
+                
+            </div>
+
+            <!-- Product Image -->
+            <a href="/product/apple/" class="product-img-wrapper">
+                
+                    <img src="/media/products/apple.webp" alt="Apple" loading="lazy">
+                
+            </a>
+
+            <!-- Product Details -->
+            <div class="product-info">
+                <div class="product-category">Fresh Fruits &amp; Vegetables</div>
+                <a href="/product/apple/" class="product-name">
+                    Apple
+                </a>
+                <div class="product-unit">per kg</div>
+
+                <div class="product-bottom-row">
+                    <div class="price-box">
+                        <span class="current-price">₹88.00</span>
+                        
+                            <span class="old-price">₹100.00</span>
+                        
+                    </div>
+
+                    
+                        <form action="/cart/add/29/" method="POST" style="margin: 0;">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="GOdJaPTWZFlbYBBaryl1kzWcCBEGOA3r949yuVFZzjXkJIf2bjmpgfkZ1Ss4WjBd">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn-add-cart ajax-add-to-cart" title="Add to Cart" id="addCartBtn_29">
+                                <i class="fas fa-cart-plus"></i> Add
+                            </button>
+                        </form>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="product-card">
+            <!-- Badges -->
+            <div class="product-badge-group">
+                
+                    <span class="badge-discount">-14% OFF</span>
+                
+                
+            </div>
+
+            <!-- Product Image -->
+            <a href="/product/carrot/" class="product-img-wrapper">
+                
+                    <img src="/media/products/carrot.jpg" alt="Carrot" loading="lazy">
+                
+            </a>
+
+            <!-- Product Details -->
+            <div class="product-info">
+                <div class="product-category">Fresh Fruits &amp; Vegetables</div>
+                <a href="/product/carrot/" class="product-name">
+                    Carrot
+                </a>
+                <div class="product-unit">per kg</div>
+
+                <div class="product-bottom-row">
+                    <div class="price-box">
+                        <span class="current-price">₹30.00</span>
+                        
+                            <span class="old-price">₹35.00</span>
+                        
+                    </div>
+
+                    
+                        <form action="/cart/add/28/" method="POST" style="margin: 0;">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="GOdJaPTWZFlbYBBaryl1kzWcCBEGOA3r949yuVFZzjXkJIf2bjmpgfkZ1Ss4WjBd">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn-add-cart ajax-add-to-cart" title="Add to Cart" id="addCartBtn_28">
+                                <i class="fas fa-cart-plus"></i> Add
+                            </button>
+                        </form>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="product-card">
+            <!-- Badges -->
+            <div class="product-badge-group">
+                
+                    <span class="badge-discount">-12% OFF</span>
+                
+                
+            </div>
+
+            <!-- Product Image -->
+            <a href="/product/brinjal/" class="product-img-wrapper">
+                
+                    <img src="/media/products/Brinjal.avif" alt="BRINJAL" loading="lazy">
+                
+            </a>
+
+            <!-- Product Details -->
+            <div class="product-info">
+                <div class="product-category">Fresh Fruits &amp; Vegetables</div>
+                <a href="/product/brinjal/" class="product-name">
+                    BRINJAL
+                </a>
+                <div class="product-unit">per kg</div>
+
+                <div class="product-bottom-row">
+                    <div class="price-box">
+                        <span class="current-price">₹35.00</span>
+                        
+                            <span class="old-price">₹40.00</span>
+                        
+                    </div>
+
+                    
+                        <form action="/cart/add/27/" method="POST" style="margin: 0;">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="GOdJaPTWZFlbYBBaryl1kzWcCBEGOA3r949yuVFZzjXkJIf2bjmpgfkZ1Ss4WjBd">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn-add-cart ajax-add-to-cart" title="Add to Cart" id="addCartBtn_27">
+                                <i class="fas fa-cart-plus"></i> Add
+                            </button>
+                        </form>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="product-card">
+            <!-- Badges -->
+            <div class="product-badge-group">
+                
+                    <span class="badge-discount">-12% OFF</span>
+                
+                
+            </div>
+
+            <!-- Product Image -->
+            <a href="/product/eggs/" class="product-img-wrapper">
+                
+                    <img src="/media/products/eggs.jpg" alt="Eggs" loading="lazy">
+                
+            </a>
+
+            <!-- Product Details -->
+            <div class="product-info">
+                <div class="product-category">Dairy, Milk &amp; Eggs</div>
+                <a href="/product/eggs/" class="product-name">
+                    Eggs
+                </a>
+                <div class="product-unit">per piece / item</div>
+
+                <div class="product-bottom-row">
+                    <div class="price-box">
+                        <span class="current-price">₹7.00</span>
+                        
+                            <span class="old-price">₹8.00</span>
+                        
+                    </div>
+
+                    
+                        <form action="/cart/add/26/" method="POST" style="margin: 0;">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="GOdJaPTWZFlbYBBaryl1kzWcCBEGOA3r949yuVFZzjXkJIf2bjmpgfkZ1Ss4WjBd">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn-add-cart ajax-add-to-cart" title="Add to Cart" id="addCartBtn_26">
+                                <i class="fas fa-cart-plus"></i> Add
+                            </button>
+                        </form>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="product-card">
+            <!-- Badges -->
+            <div class="product-badge-group">
+                
+                    <span class="badge-discount">-20% OFF</span>
+                
+                
+            </div>
+
+            <!-- Product Image -->
+            <a href="/product/milk/" class="product-img-wrapper">
+                
+                    <img src="/media/products/milk.jpg" alt="Milk" loading="lazy">
+                
+            </a>
+
+            <!-- Product Details -->
+            <div class="product-info">
+                <div class="product-category">Dairy, Milk &amp; Eggs</div>
+                <a href="/product/milk/" class="product-name">
+                    Milk
+                </a>
+                <div class="product-unit">per liter</div>
+
+                <div class="product-bottom-row">
+                    <div class="price-box">
+                        <span class="current-price">₹40.00</span>
+                        
+                            <span class="old-price">₹50.00</span>
+                        
+                    </div>
+
+                    
+                        <form action="/cart/add/25/" method="POST" style="margin: 0;">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="GOdJaPTWZFlbYBBaryl1kzWcCBEGOA3r949yuVFZzjXkJIf2bjmpgfkZ1Ss4WjBd">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn-add-cart ajax-add-to-cart" title="Add to Cart" id="addCartBtn_25">
+                                <i class="fas fa-cart-plus"></i> Add
+                            </button>
+                        </form>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="product-card">
+            <!-- Badges -->
+            <div class="product-badge-group">
+                
+                    <span class="badge-discount">-6% OFF</span>
+                
+                
+            </div>
+
+            <!-- Product Image -->
+            <a href="/product/fruit-juices/" class="product-img-wrapper">
+                
+                    <img src="/media/products/juices.jpg" alt="Fruit Juices" loading="lazy">
+                
+            </a>
+
+            <!-- Product Details -->
+            <div class="product-info">
+                <div class="product-category">Beverages &amp; Juices</div>
+                <a href="/product/fruit-juices/" class="product-name">
+                    Fruit Juices
+                </a>
+                <div class="product-unit">per liter</div>
+
+                <div class="product-bottom-row">
+                    <div class="price-box">
+                        <span class="current-price">₹75.00</span>
+                        
+                            <span class="old-price">₹80.00</span>
+                        
+                    </div>
+
+                    
+                        <form action="/cart/add/24/" method="POST" style="margin: 0;">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="GOdJaPTWZFlbYBBaryl1kzWcCBEGOA3r949yuVFZzjXkJIf2bjmpgfkZ1Ss4WjBd">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn-add-cart ajax-add-to-cart" title="Add to Cart" id="addCartBtn_24">
+                                <i class="fas fa-cart-plus"></i> Add
+                            </button>
+                        </form>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="product-card">
+            <!-- Badges -->
+            <div class="product-badge-group">
+                
+                    <span class="badge-discount">-17% OFF</span>
+                
+                
+            </div>
+
+            <!-- Product Image -->
+            <a href="/product/fresh-bread/" class="product-img-wrapper">
+                
+                    <img src="/media/products/bread.jpg" alt="Fresh Bread" loading="lazy">
+                
+            </a>
+
+            <!-- Product Details -->
+            <div class="product-info">
+                <div class="product-category">Bakery &amp; Fresh Bread</div>
+                <a href="/product/fresh-bread/" class="product-name">
+                    Fresh Bread
+                </a>
+                <div class="product-unit">per packet</div>
+
+                <div class="product-bottom-row">
+                    <div class="price-box">
+                        <span class="current-price">₹50.00</span>
+                        
+                            <span class="old-price">₹60.00</span>
+                        
+                    </div>
+
+                    
+                        <form action="/cart/add/23/" method="POST" style="margin: 0;">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="GOdJaPTWZFlbYBBaryl1kzWcCBEGOA3r949yuVFZzjXkJIf2bjmpgfkZ1Ss4WjBd">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn-add-cart ajax-add-to-cart" title="Add to Cart" id="addCartBtn_23">
+                                <i class="fas fa-cart-plus"></i> Add
+                            </button>
+                        </form>
+                    
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <!-- Pagination -->
+    
+
+    
+
+        </div>
+    </main>
+
+    <!-- Toast Notification Container for AJAX Cart -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container footer-grid">
+            <div>
+                <div class="brand-logo" style="margin-bottom: 14px;">
+                    <i class="fas fa-leaf" style="color: #34d399;"></i>
+                    <span style="color: #ffffff;">Fresh<strong style="color: #34d399;">Cart</strong></span>
+                </div>
+                <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6; margin-bottom: 18px;">
+                    Your trustworthy daily online grocery marketplace. 100% farm-fresh fruits, organic vegetables, dairy, and pantry items delivered swiftly to your doorstep.
+                </p>
+                <div class="footer-social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="footer-heading">Quick Links</h4>
+                <ul class="footer-links-list">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/products/">Shop Catalog</a></li>
+                    <li><a href="/cart/">My Cart</a></li>
+                    <li><a href="/my-orders/">Track Orders</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="footer-heading">Top Categories</h4>
+                <ul class="footer-links-list">
+                    
+                    <li><a href="/products/?category=bakery-fresh-bread">Bakery &amp; Fresh Bread</a></li>
+                    
+                    <li><a href="/products/?category=beverages-juices">Beverages &amp; Juices</a></li>
+                    
+                    <li><a href="/products/?category=cat1">Cat1</a></li>
+                    
+                    <li><a href="/products/?category=dairy-milk-eggs">Dairy, Milk &amp; Eggs</a></li>
+                    
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="footer-heading">Contact & Support</h4>
+                <ul class="footer-contact-info">
+                    <li><i class="fas fa-phone"></i> +1 (800) 555-FRESH</li>
+                    <li><i class="fas fa-envelope"></i> support@freshcart.com</li>
+                    <li><i class="fas fa-location-dot"></i> 742 Evergreen Terrace, Grocery Hub</li>
+                    <li><i class="fas fa-clock"></i> Mon - Sun: 7:00 AM - 10:00 PM</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="container footer-bottom-content">
+                <div>&copy; 2026 FreshCart Grocery Store. All rights reserved.</div>
+                <div style="display: flex; gap: 16px;">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Refund Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Client-Side JavaScript -->
+    <script src="/static/js/script.js"></script>
+    
+</body>
+</html>

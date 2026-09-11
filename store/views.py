@@ -7,6 +7,7 @@ from django.http import JsonResponse, HttpResponse
 from django.core.paginator import Paginator
 from django.db.models import Q, Sum, Count, F, Avg
 from django.utils import timezone
+from django.urls import reverse
 from datetime import timedelta, datetime
 import json
 
@@ -166,6 +167,9 @@ def cart_view(request):
 
 
 def add_to_cart(request, product_id):
+    if request.method != 'POST':
+        return redirect('store:product_list')
+
     product = get_object_or_404(Product, id=product_id)
     cart = _get_cart(request)
     quantity = int(request.POST.get('quantity', 1))
@@ -201,7 +205,8 @@ def add_to_cart(request, product_id):
         })
 
     messages.success(request, msg)
-    return redirect(request.META.get('HTTP_REFERER', 'store:cart'))
+    referer = request.META.get('HTTP_REFERER')
+    return redirect(referer) if referer else redirect(reverse('store:cart'))
 
 
 def update_cart(request, item_id):
